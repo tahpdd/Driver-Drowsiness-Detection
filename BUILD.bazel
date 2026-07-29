@@ -1,0 +1,59 @@
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_import(
+    name = "onnxruntime_shared",
+    shared_library =
+        "third_party/onnxruntime/lib/libonnxruntime.so.1",
+)
+
+cc_library(
+    name = "onnxruntime",
+
+    hdrs = glob([
+        "third_party/onnxruntime/include/**/*.h",
+        "third_party/onnxruntime/include/**/*.hpp",
+    ]),
+
+    includes = [
+        "third_party/onnxruntime/include",
+    ],
+
+    deps = [
+        ":onnxruntime_shared",
+    ],
+)
+
+cc_binary(
+    name = "ddd_app",
+
+    srcs = glob([
+        "src/*.cpp",
+        "include/*.h",
+        "include/*.hpp",
+    ]),
+
+    includes = [
+        "include",
+    ],
+
+    copts = [
+        "-std=c++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-pthread",
+    ],
+
+    linkopts = [
+        "-pthread",
+    ],
+
+    deps = [
+        ":onnxruntime",
+        "//mediapipe/framework/formats:image_format_cc_proto",
+        "//mediapipe/tasks/cc/vision/face_landmarker:face_landmarker",
+        "//mediapipe/tasks/cc/vision/utils:image_utils",
+    ],
+)
