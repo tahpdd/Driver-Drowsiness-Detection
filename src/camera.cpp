@@ -58,9 +58,10 @@ bool Camera::read_frame(CameraFrame& frame) {
     }
 
     std::unique_lock<std::mutex> lock(frame_mutex);
-    frame_condition.wait(lock, [this] {
-        return frame_ready || !running;
-    });
+
+    while (!frame_ready && running) {
+        frame_condition.wait(lock);
+    }
 
     if (!frame_ready) {
         return false;
